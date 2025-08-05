@@ -1,6 +1,6 @@
 import { expressMiddleware } from '@as-integrations/express5';
 import http from "http";
-// import cors from 'cors';
+import cors from 'cors';
 import createApolloGraphqlServer from "./graphql";
 // import dotenv from 'dotenv';
 // import { verifyToken } from './utils/jwt';
@@ -14,14 +14,14 @@ async function main() {
   const httpServer = http.createServer(app);
 
   app.use(express.json());
-  //   app.use(
-  //     cors({
-  //       origin: 'http://localhost:3000',
-  //       credentials: true,
-  //       methods: ['GET', 'POST', 'OPTIONS'],
-  //       allowedHeaders: ['Content-Type', 'Authorization'],
-  //     })
-  //   );
+    app.use(
+      cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS'],
+        // allowedHeaders: ['Content-Type', 'Authorization'],
+      })
+    );
 
   //   app.use(cookieParser());
 

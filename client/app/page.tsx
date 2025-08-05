@@ -3,6 +3,7 @@
 import Image from "next/image";
 import UserInputCard from "@/components/userInputCard/UserInputCard";
 import { useState } from "react";
+import UserDisplayCard from "@/components/userDisplayCard/UserDisplayCard";
 export default function Home() {
   const [fname, setFname] = useState<string>("");
   const [lname, setLname] = useState<string>("");
@@ -11,7 +12,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col w-screen">
-      <UserInputCard setFname={setFname} setLname={setLname} setAge={setAge}  />
+      <UserInputCard setFname={setFname} setLname={setLname} setAge={setAge} setMarried={setMarried}  />
+      <UserDisplayCard fname={fname} lname={lname} married={married} age={age}/>
     </div>
   );
 }
