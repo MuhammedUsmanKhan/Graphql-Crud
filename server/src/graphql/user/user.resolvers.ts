@@ -4,10 +4,10 @@ const userService = new UserService();
 
 export const resolvers = {
   Query: {
-    getUserById: async (_: any, {id}:{id: number}) => {
+    getUserById: async (_: any, { id }: { id: number }) => {
       try {
-         console.log({userServiceId:id});
-         
+        console.log({ userServiceId: id });
+
         return await userService.getUserById(Number(id));
       } catch (error) {
         console.log(error);
@@ -25,7 +25,9 @@ export const resolvers = {
   },
 
   Mutation: {
-    createUser: async (_: any, input: any) => {
+    createUser: async (_: any, { input }: { input: any }) => {
+      console.log({ input });
+
       try {
         return await userService.createUser(input);
       } catch (error) {
@@ -37,8 +39,8 @@ export const resolvers = {
       try {
         return await userService.updateUser(id, input);
       } catch (error) {
-         console.log(error);
-         throw error
+        console.log(error);
+        throw error;
       }
     },
   },

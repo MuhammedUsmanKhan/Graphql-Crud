@@ -1,25 +1,56 @@
 "use client";
 
-
 import React from "react";
 
 import { useQuery } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { Create_User } from "@/graphql/user/mutation";
+import { useUserStore } from "@/store/userStore/userStore";
+import { GET_ALL_USERS } from "@/graphql/user/query";
 
+// type props = {
+//   setFname: (fname: string) => void;
+//   setLname: (lname: string) => void;
+//   setAge: (age: number) => void;
+//   setMarried: (married: boolean) => void;
+//   // setMarried: (married: boolean) => void;
+// };
 
-type props = {
-  setFname: (fname: string) => void;
-  setLname: (lname: string) => void;
-  setAge: (age: number) => void;
-  setMarried: (married: boolean) => void;
-  // setMarried: (married: boolean) => void;
-};
+const UserInputCard = () => {
+  // const { setFname, setLname, setAge, setMarried } = props;
 
-const UserInputCard = (props: props) => {
-  const { setFname, setLname, setAge, setMarried } = props;
+  const fname = useUserStore((state) => state.fname);
+  const lname = useUserStore((state) => state.lname);
+  const age = useUserStore((state) => state.age);
+  const married = useUserStore((state) => state.married);
 
-const {} = useMutation(Create_User)
+  const setFname = useUserStore((state) => state.setFname);
+  const setLname = useUserStore((state) => state.setLname);
+  const setAge = useUserStore((state) => state.setAge);
+  const setMarried = useUserStore((state) => state.setMarried);
+
+  const [createUser, { loading: isUserLoading }] = useMutation(Create_User,{refetchQueries: [{ query: GET_ALL_USERS }]});
+
+  const handleSubmit = () => {
+    console.log({
+      user: {
+        fname,
+        lname,
+        age,
+        married,
+      },
+    });
+    createUser({
+      variables: {
+        input: {
+          fname,
+          lname,
+          age,
+          married,
+        },
+      },
+    });
+  };
 
   return (
     <div className="flex flex-col w-screen h-96 space-y-8 items-center justify-center ">
@@ -87,9 +118,12 @@ const {} = useMutation(Create_User)
             <option value={"false"}>No</option>
           </select>
         </div>
-        <button className="border-2 border-amber-600 w-full p-2 cursor-pointer" onClick={()=>{
-
-        }}>Create User</button>
+        <button
+          className="border-2 border-amber-600 w-full p-2 cursor-pointer"
+          onClick={handleSubmit}
+        >
+          {isUserLoading ? "Submit...." : "Submit"}
+        </button>
       </div>
     </div>
   );
