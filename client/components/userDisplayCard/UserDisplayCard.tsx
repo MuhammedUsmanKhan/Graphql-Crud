@@ -2,6 +2,8 @@
 import React, { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_ALL_USERS } from "@/graphql/user/query";
+import { useUserStore } from "@/store/userStore/userStore";
+import UpdateModal from "../updateModal/UpdateModal";
 // import { users } from "../../../constants";
 // type props = {
 //   fname: string;
@@ -15,12 +17,15 @@ const UserDisplayCard = () => {
 
   const { data } = useQuery(GET_ALL_USERS);
 
-  // useEffect(() => {
+  const { setUpdateModalPopup, setUserId } = useUserStore();
 
-  // }, [data]);
+  const handleUpdateUserPopup = (userId: string) => {
+    setUserId(userId);
+    setUpdateModalPopup(true);
+  };
 
   return (
-    <div className="flex flex-wrap justify-center w-screen border gap-8">
+    <div className="flex flex-wrap justify-center w-screen  gap-8">
       {data?.getAllUsers?.map((user: any) => {
         return (
           <div
@@ -40,12 +45,18 @@ const UserDisplayCard = () => {
               </div>
             </div>
             <div className="flex flex-col justify-center space-y-4 flex-1 border border-green-700 ">
-              <button className="border p-2">Update</button>
+              <button
+                className="border p-2"
+                onClick={() => handleUpdateUserPopup(user.id)}
+              >
+                Update
+              </button>
               <button className="border p-2">Delete</button>
             </div>
           </div>
         );
       })}
+      <UpdateModal  />
     </div>
   );
 };

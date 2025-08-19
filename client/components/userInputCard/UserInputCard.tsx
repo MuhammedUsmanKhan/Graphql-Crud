@@ -7,35 +7,45 @@ import { useMutation } from "@apollo/client";
 import { Create_User } from "@/graphql/user/mutation";
 import { useUserStore } from "@/store/userStore/userStore";
 import { GET_ALL_USERS } from "@/graphql/user/query";
-
-// type props = {
-//   setFname: (fname: string) => void;
-//   setLname: (lname: string) => void;
-//   setAge: (age: number) => void;
-//   setMarried: (married: boolean) => void;
-//   // setMarried: (married: boolean) => void;
-// };
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { UserFormData, userFormSchema } from "./schema";
 
 const UserInputCard = () => {
-  // const { setFname, setLname, setAge, setMarried } = props;
+  //one way is like this and other is more better like destructuring.
+  // const fname = useUserStore((state) => state.fname);
+  // const lname = useUserStore((state) => state.lname);
+  // const age = useUserStore((state) => state.age);
+  // const married = useUserStore((state) => state.married);
 
-  const fname = useUserStore((state) => state.fname);
-  const lname = useUserStore((state) => state.lname);
-  const age = useUserStore((state) => state.age);
-  const married = useUserStore((state) => state.married);
+  // const { fname, lname, age, married, setAge, setFname, setLname, setMarried } =
+  //   useUserStore();
 
-  const setFname = useUserStore((state) => state.setFname);
-  const setLname = useUserStore((state) => state.setLname);
-  const setAge = useUserStore((state) => state.setAge);
-  const setMarried = useUserStore((state) => state.setMarried);
+  const [createUser, { loading: isUserLoading }] = useMutation(Create_User, {
+    refetchQueries: [{ query: GET_ALL_USERS }],
+  });
 
-  const [createUser, { loading: isUserLoading }] = useMutation(Create_User,{refetchQueries: [{ query: GET_ALL_USERS }]});
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<UserFormData>({
+    resolver: zodResolver(userFormSchema),
+    mode: "onChange",
+  });
 
-  const handleSubmit = () => {
+  const onSubmit = (formData: UserFormData) => {
+    const { firstName, lastName, age, married } = formData;
+
+    console.log(formData);
+
     console.log({
       user: {
-        fname,
-        lname,
+        fname: firstName,
+        lname: lastName,
         age,
         married,
       },
@@ -43,32 +53,33 @@ const UserInputCard = () => {
     createUser({
       variables: {
         input: {
-          fname,
-          lname,
+          fname: firstName,
+          lname: lastName,
           age,
           married,
         },
       },
     });
+
+    reset();
   };
 
   return (
     <div className="flex flex-col w-screen h-96 space-y-8 items-center justify-center ">
       <div className="text-3xl">Enter User Detail Form</div>
-      <div className="flex flex-col items-baseline space-y-4 rounded-3xl p-4 w-xl border-2 border-cyan-600">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col items-baseline space-y-4 rounded-3xl p-4 w-xl border-2 border-cyan-600"
+      >
         <div className="flex space-x-4 w-full ">
           <label htmlFor="fname" className="flex text-lg w-28">
             First Name
           </label>
           <input
+            {...register("firstName")}
             type="text"
             id="fname"
-            name="fname"
             className="flex-1 border rounded-sm p-1"
-            onChange={(e) => {
-              console.log({ fname: e.target.value });
-              setFname(e.target.value);
-            }}
           />
         </div>
         <div className="flex w-full space-x-4">
@@ -76,14 +87,10 @@ const UserInputCard = () => {
             Last Name
           </label>
           <input
+            {...register("lastName")}
             type="text"
             id="lname"
-            name="lname"
             className="flex-1 border rounded-sm p-1"
-            onChange={(e) => {
-              console.log({ lname: e.target.value });
-              setLname(e.target.value);
-            }}
           />
         </div>
         <div className="flex w-full space-x-4">
@@ -91,14 +98,10 @@ const UserInputCard = () => {
             Age
           </label>
           <input
+            {...register("age", { valueAsNumber: true })}
             type="number"
-            name="age"
             id="age"
             className="flex-1 border rounded-sm p-1"
-            onChange={(e) => {
-              console.log({ age: e.target.value });
-              setAge(Number(e.target.value));
-            }}
           />
         </div>
         <div className="flex w-full space-x-4 ">
@@ -106,13 +109,11 @@ const UserInputCard = () => {
             Married
           </label>
           <select
+            {...register("married", {
+              setValueAs: (v) => v === "true", // convert string -> boolean
+            })}
             id="married"
-            name="married"
             className="flex-1 border rounded-sm p-1"
-            onChange={(e) => {
-              console.log({ married: e.target.value });
-              setMarried(e.target.value === "true");
-            }}
           >
             <option value={"true"}>Yes</option>
             <option value={"false"}>No</option>
@@ -120,11 +121,11 @@ const UserInputCard = () => {
         </div>
         <button
           className="border-2 border-amber-600 w-full p-2 cursor-pointer"
-          onClick={handleSubmit}
+          type="submit"
         >
           {isUserLoading ? "Submit...." : "Submit"}
         </button>
-      </div>
+      </form>
     </div>
   );
 };
